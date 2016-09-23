@@ -1,5 +1,5 @@
-storageManager1:test_assign1_1.o dberror.o storage_mgr.o
-	gcc test_assign1_1.o dberror.o storage_mgr.o -o storageManager1
+storage_Manager_TC1:test_assign1_1.o dberror.o storage_mgr.o
+	gcc test_assign1_1.o dberror.o storage_mgr.o -o storage_Manager_TC1
 dberror.o:dberror.c dberror.h
 	gcc -c dberror.c
 storage_mgr.o:storage_mgr.c storage_mgr.h dberror.h
