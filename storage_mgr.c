@@ -83,8 +83,8 @@ RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
 	int flag = O_RDWR|O_APPEND;
 	int fd = open(fileName, flag);
 
-	// fcntl gets or changes the file status, the seconed parameter "F_GETFL"
-	// is used for get the flag, if the file is opened correctly, it returns a 
+	// fcntl gets or changes the file status, the second parameter "F_GETFL"
+	// is used to get the flag, if the file is opened correctly, it returns a 
 	// non-negative integer.
 	if (fcntl(fd, F_GETFL) < 0) {
 		return RC_FILE_NOT_FOUND;
@@ -103,6 +103,10 @@ RC openPageFile (char *fileName, SM_FileHandle *fHandle) {
 	fHandle->fileName = fileName;
 	fHandle->totalNumPages = size/PAGE_SIZE;
 	fHandle->curPagePos = 0;
+
+
+	// close file descriptor.
+	close(fd);
 
 	return RC_OK;
 }
@@ -183,7 +187,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage) {
 **      Method Name : getBlockPos
 **      Description: The method returns the current page position in a file
 **      Input Parameters : An existing file handle
-**      Return Value : RC_OK | RC_READ_NON_EXISTING_PAGE
+**      Return Value : An Integer, the current page position in a file
 **
 ******************************************************************************************************************
 */
@@ -292,7 +296,7 @@ RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 ******************************************************************************************************************
 **
 **      Method Name : writeBlock
-**      Description: The method Write a page to disk. 
+**      Description: The method Writes a page to disk. 
 **      Input Parameters : An Integer "pageNum", An existing file handle and a Page handle
 **      Return Value : RC_OK | RC_READ_NON_EXISTING_PAGE | RC_WRITE_FAILED
 **
@@ -349,17 +353,20 @@ RC appendEmptyBlock (SM_FileHandle *fHandle) {
 	int fd = fHandle->mgmtInfo;
 
 	if(write(fd, memPage, PAGE_SIZE) < 0) {
+		close(fd);
 		return RC_WRITE_FAILED;
 	}
 	else {
+		close(fd);
 		return RC_OK;
 	}
+	
 }
 /*
 ******************************************************************************************************************
 **
 **      Method Name : ensureCapacity
-**      Description: If the file has less than numberOfPages pages then the method increase the size to numberOfPages.  
+**      Description: If the file has less than numberOfPages pages then the method increases the size to numberOfPages.  
 **      Input Parameters :  An Integer "totalNumPages" and An existing file handle
 **      Return Value : RC_OK
 **
